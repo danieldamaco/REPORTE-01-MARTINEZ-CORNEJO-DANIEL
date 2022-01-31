@@ -130,10 +130,12 @@ con los 10 productos con menores búsquedas.
         sales[:,1].count(product)
     """
 
-    top_products_reviewed=[]
+    
     sales_reviewed = sales[:,(1,2)]
-
     categories = str(list(range(1, 97)))
+
+#Futura función que agrupa según score. No considera los productos sin reseñas. 
+    top_products_reviewed=[]
     for j in range(1, 97):
         temp=[]
         for i in range(0, len(sales_reviewed)):
@@ -143,6 +145,7 @@ con los 10 productos con menores búsquedas.
         if temp != []:
             top_products_reviewed.append([j, temp])
     
+#Futura variable que calcula el promedio redondeado a dos decimales de la lista de scores por producto 
     average_scores = []
     for id, scores in top_products_reviewed:
         sum = 0
@@ -152,7 +155,15 @@ con los 10 productos con menores búsquedas.
 
         average_scores.append([id, mean])
     
-    print(average_scores)
+    sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
+    
+    
+    print("\n\nLa lista con los 5 productos con mejores reseñas son: \n" + 
+        str(list(sorted_scores)[0:5]))
+
+    print("\n\nLa lista con los 5 productos con peores reseñas son: \n" + 
+        str(list(sorted_scores)[::-1][0:5]))
+
     
     
     
