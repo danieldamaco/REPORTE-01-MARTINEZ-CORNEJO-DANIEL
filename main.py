@@ -28,28 +28,33 @@ def ordenamineto_de_burbuja(dict):
     
     return sorted_dict
 
+def groupby(categories, sorted_sales_cate, n):
+    less_saled_cate=[]
+    for j in categories:
+        temp=[]
+        for i in range(0, 95):
+            if sorted_sales_cate[i][2] == j:
+                temp.append([sorted_sales_cate[i][0], sorted_sales_cate[i][1]])
+        temp_sorted = list(ordenamineto_de_burbuja(dict(temp)))[::-1]
+        less_saled_cate.append([j,temp_sorted[0:n]])
+    return less_saled_cate
+
 def main():
     """
-    1) Productos más vendidos y productos rezagados a partir del análisis de
-    las categorías con menores ventas y categorías con menores búsquedas.
+1) Productos más vendidos y productos rezagados a partir del análisis de
+las categorías con menores ventas y categorías con menores búsquedas.
 
-    - Generar un listado de los 5 productos con mayores ventas y con los 10 
-    productos con mayores búsquedas. 
-    - Por categorías, generar un listado con los 5 productos con menores ventas y 
-    con los 10 productos con menores búsquedas. 
+- Generar un listado de los 5 productos con mayores ventas y con los 10 
+productos con mayores búsquedas. 
+"""
 
-    ifestore_searches = [id_search, id product]
-    lifestore_sales = [id_sale, id_product, score (from 1 to 5), date, refund (1 for true or 0 to false)]
-    lifestore_products = [id_product, name, price, category, stock]
-    sales[:,1].count(product)
-    """
-    #5 PRODUCTOS CON MAYORES VENTAS
-    count_sales = {}
     sales = np.array(lifestore_sales)
     products = np.array(lifestore_products)
     searches = np.array(lifestore_searches)
 
+#5 PRODUCTOS CON MAYORES VENTAS
     id_prod_sales = list(sales[:,1])
+    count_sales = {}
 
     for product in products[:,0]:
         count_sales.update({
@@ -61,42 +66,54 @@ def main():
     n=5
     head_sales = dict(list(sales_sorted.items())[0:n])
 
-    print(head_sales)
+    print(f"\n\n Los {n} productos con mayores ventas \n" + str(head_sales))
     
-    #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
+#PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     id_prod_searches = list(searches[:,1])
     count_searches = {}
     for product in products[:,0]:
         count_searches.update({
             int(product): id_prod_searches.count(int(product))})
-        
-
-    #print(count_searches)
     
     searches_sorted = ordenamineto_de_burbuja(count_searches)
     
     #Primeros n numeros de sales 
     n=10
     head_searches = dict(list(searches_sorted.items())[0:n])
-    print(head_searches)
+    print(f"\n\n Los {n} productos con mayores busquedas \n" + str(head_searches))
+
+    """
+ - Por categorías, generar un listado con los 5 productos con menores ventas y 
+con los 10 productos con menores búsquedas. 
+"""
+
+    categories = ['procesadores', 'tarjetas de video', 'tarjetas madre', 'discos duros', 
+            'memorias usb', 'pantallas', 'bocinas', 'audifonos']
+    category = []
+
+   #Creación de matriz id_product y category 
+    for product in products[:,0]:
+        category.append([product, products[int(product)-1,3]])
+    
+#5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA 
+    #Creacion de matriz con id product, no de ventas, categoría 
+    sorted_sales_cate = []
+    for key, value in count_sales.items():
+        sorted_sales_cate.append([key, value, category[key-1][1]])
+
+    less_saled_cate = groupby(categories, sorted_sales_cate, 5)
+    print(f'\n\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
+
+#10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
+    sorted_searches_cate = []
+    for key, value in count_searches.items():
+        sorted_searches_cate.append([key, value, category[key-1][1]])
+
+    less_searches_cate = groupby(categories, sorted_searches_cate, 10)
+    print(f'\n\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
 
 
 if __name__ == '__main__':
     main()
 
-
-
-
-
-
-
-
-
-"""
-2) Productos por reseña en el servicio a partir del análisis de categorías
-con mayores ventas y categorías con mayores búsquedas.
-3) Sugerir una estrategia de productos a retirar del mercado así como
-sugerencia de cómo reducir la acumulación de inventario considerando los
-datos de ingresos y ventas mensuales.
-"""
 
