@@ -29,10 +29,15 @@ def ordenamineto_de_burbuja(dict):
     return sorted_dict
 
 def groupby(categories, sorted_sales_cate, n):
+    """
+    Función que genera una matriz que agrupa los elementos por categoria
+    con la estructura [nombre de la categoría, los n últimos valores (ventas/búsquedas)]
+    """
+
     less_saled_cate=[]
     for j in categories:
         temp=[]
-        for i in range(0, 95):
+        for i in range(0, len(sorted_sales_cate)):
             if sorted_sales_cate[i][2] == j:
                 temp.append([sorted_sales_cate[i][0], sorted_sales_cate[i][1]])
         temp_sorted = list(ordenamineto_de_burbuja(dict(temp)))[::-1]
@@ -41,13 +46,12 @@ def groupby(categories, sorted_sales_cate, n):
 
 def main():
     """
-1) Productos más vendidos y productos rezagados a partir del análisis de
-las categorías con menores ventas y categorías con menores búsquedas.
+    1) Productos más vendidos y productos rezagados a partir del análisis de
+    las categorías con menores ventas y categorías con menores búsquedas.
 
-- Generar un listado de los 5 productos con mayores ventas y con los 10 
-productos con mayores búsquedas. 
-"""
-
+    - Generar un listado de los 5 productos con mayores ventas y con los 10 
+    productos con mayores búsquedas. 
+    """
     sales = np.array(lifestore_sales)
     products = np.array(lifestore_products)
     searches = np.array(lifestore_searches)
@@ -111,9 +115,50 @@ con los 10 productos con menores búsquedas.
 
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
     print(f'\n\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
+    
+    """
+    2) Productos por reseña en el servicio a partir del análisis de categorías
+    con mayores ventas y categorías con mayores búsquedas.
+
+    Mostrar dos listados de 5 productos cada una, un listado para
+    productos con las mejores reseñas y otro para las peores, considerando
+    los productos con devolución. (No cosiderar sin reseña)
+
+    ifestore_searches = [id_search, id product]
+        lifestore_sales = [id_sale, id_product, score (from 1 to 5), date, refund (1 for true or 0 to false)]
+        lifestore_products = [id_product, name, price, category, stock]
+        sales[:,1].count(product)
+    """
+
+    top_products_reviewed=[]
+    sales_reviewed = sales[:,(1,2)]
+
+    categories = str(list(range(1, 97)))
+    for j in range(1, 97):
+        temp=[]
+        for i in range(0, len(sales_reviewed)):
+            if sales_reviewed[i, 0] == str(j):
+                temp.append(sales_reviewed[i, 1])
+
+        if temp != []:
+            top_products_reviewed.append([j, temp])
+    
+    average_scores = []
+    for id, scores in top_products_reviewed:
+        sum = 0
+        for i in scores:
+            sum += int(i)
+        mean = round(sum/len(scores), 2)
+
+        average_scores.append([id, mean])
+    
+    print(average_scores)
+    
+    
+    
+
+
 
 
 if __name__ == '__main__':
     main()
-
-
