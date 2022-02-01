@@ -170,17 +170,30 @@ con los 10 productos con menores búsquedas.
     (número de ventas, total de ingresos)
     """
     from datetime import datetime
-    # Convertimos un string con formato <día>/<mes>/<año> en datetime
     
+    # Creación de matriz con precio del producto vendido y fecha de venta.
+    # convertimos un string con formato <día>/<mes>/<año> en datetime.
+
     date_count_sales =[]
     for  id_product, date in sales[:,(1,3)]:
         date_count_sales.append([
             products[int(id_product)-1, 2],
             datetime.strptime(date, '%d/%m/%Y')
             ])
-    print(ordenamineto_de_burbuja(dict(date_count_sales)))
 
-    #problema porque solo ordena 39 de la lista de las fechas y precios. 
+    sales_per_month_year=[]
+    for j in range(1, 13):
+        #print(type(j)) #En caso de que necesites validar consistencia de tipado 
+        temp=[]
+        for i in range(0, len(date_count_sales)):
+            #print(type(date_count_sales[i][1])) #En caso de que necesites validar consistencia de tipado 
+            if int(date_count_sales[i][1].month) == j and int(date_count_sales[i][1].year) > 2019:
+                temp.append(date_count_sales[i][0])
+
+        sales_per_month_year.append([j, temp])
+
+    print(sales_per_month_year)
+    
 
 
 if __name__ == '__main__':
