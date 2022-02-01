@@ -70,7 +70,7 @@ def main():
     n=5
     head_sales = dict(list(sales_sorted.items())[0:n])
 
-    print(f"\n\n Los {n} productos con mayores ventas \n" + str(head_sales))
+    print(f"Los {n} productos con mayores ventas \n" + str(head_sales))
     
 #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     id_prod_searches = list(searches[:,1])
@@ -84,7 +84,7 @@ def main():
     #Primeros n numeros de sales 
     n=10
     head_searches = dict(list(searches_sorted.items())[0:n])
-    print(f"\n\n Los {n} productos con mayores busquedas \n" + str(head_searches))
+    print(f"\n Los {n} productos con mayores busquedas \n" + str(head_searches))
 
     """
  - Por categorías, generar un listado con los 5 productos con menores ventas y 
@@ -106,7 +106,7 @@ con los 10 productos con menores búsquedas.
         sorted_sales_cate.append([key, value, category[key-1][1]])
 
     less_saled_cate = groupby(categories, sorted_sales_cate, 5)
-    print(f'\n\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
+    print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
 
 #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
     sorted_searches_cate = []
@@ -114,7 +114,7 @@ con los 10 productos con menores búsquedas.
         sorted_searches_cate.append([key, value, category[key-1][1]])
 
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
-    print(f'\n\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
+    print(f'\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
     
     """
     2) Productos por reseña en el servicio a partir del análisis de categorías
@@ -158,17 +158,29 @@ con los 10 productos con menores búsquedas.
     sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
     
     
-    print("\n\nLa lista con los 5 productos con mejores reseñas son: \n" + 
+    print("\nLa lista con los 5 productos con mejores reseñas son: \n" + 
         str(list(sorted_scores)[0:5]))
 
-    print("\n\nLa lista con los 5 productos con peores reseñas son: \n" + 
+    print("\nLa lista con los 5 productos con peores reseñas son: \n" + 
         str(list(sorted_scores)[::-1][0:5]))
 
     
+    """
+    Total de ingresos y ventas promedio mensuales, total anual y meses con más ventas al año. 
+    (número de ventas, total de ingresos)
+    """
+    from datetime import datetime
+    # Convertimos un string con formato <día>/<mes>/<año> en datetime
     
-    
+    date_count_sales =[]
+    for  id_product, date in sales[:,(1,3)]:
+        date_count_sales.append([
+            products[int(id_product)-1, 2],
+            datetime.strptime(date, '%d/%m/%Y')
+            ])
+    print(ordenamineto_de_burbuja(dict(date_count_sales)))
 
-
+    #problema porque solo ordena 39 de la lista de las fechas y precios. 
 
 
 if __name__ == '__main__':
