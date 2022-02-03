@@ -1,5 +1,41 @@
 from lifestore_file import lifestore_products, lifestore_sales, lifestore_searches
 import numpy as np 
+from datetime import datetime
+
+def login(func):
+    def wrapper():
+        usuarioAccedio = False
+        intentos = 0        
+        # Bienvenida!
+        mensaje_bienvenida = 'Bienvenide al sistema!\nAccede con tus credenciales'
+        print(mensaje_bienvenida)
+
+        # Recibo constantemente sus intentos
+        while not usuarioAccedio:
+            # Primero ingresa Credenciales
+            usuario = input('Usuario: ')
+            contras = input('Contrase;a: ')
+            intentos += 1
+            # Reviso si el par coincide
+            if usuario == 'jimmy' and contras == 'ymmij':
+                usuarioAccedio = True
+                print('\n\nHola de nuevo!\n\nDatos del análisis. \n\n')
+                func()
+            else:
+                # print('Tienes', 3 - intentos, 'intentos restantes')
+                print(f'Tienes {3 - intentos} intentos restantes')
+                if usuario == 'jimmy':
+                    print('Te equivocaste en la contrase;a')
+                else:
+                    print(f'El usuario: "{usuario}" no esta registrado')
+                    
+            if intentos == 3:
+                exit()
+    return wrapper
+
+def showing_products(a):
+    pass
+
 def ordenamineto_de_burbuja(dict):
     """
     Funcion para ordenar los valores de un diccionario utilizando el algortimo de ordenamiento 
@@ -44,6 +80,7 @@ def groupby(categories, sorted_sales_cate, n):
         less_saled_cate.append([j,temp_sorted[0:n]])
     return less_saled_cate
 
+@login #Decorador para el login
 def main():
     """
     1) Productos más vendidos y productos rezagados a partir del análisis de
@@ -56,7 +93,7 @@ def main():
     products = np.array(lifestore_products)
     searches = np.array(lifestore_searches)
 
-#5 PRODUCTOS CON MAYORES VENTAS
+    #5 PRODUCTOS CON MAYORES VENTAS
     id_prod_sales = list(sales[:,1])
     count_sales = {}
 
@@ -72,7 +109,7 @@ def main():
 
     print(f"Los {n} productos con mayores ventas \n" + str(head_sales))
     
-#PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
+    #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     id_prod_searches = list(searches[:,1])
     count_searches = {}
     for product in products[:,0]:
@@ -87,9 +124,9 @@ def main():
     print(f"\n Los {n} productos con mayores busquedas \n" + str(head_searches))
 
     """
- - Por categorías, generar un listado con los 5 productos con menores ventas y 
-con los 10 productos con menores búsquedas. 
-"""
+     - Por categorías, generar un listado con los 5 productos con menores ventas y 
+    con los 10 productos con menores búsquedas. 
+    """
 
     categories = ['procesadores', 'tarjetas de video', 'tarjetas madre', 'discos duros', 
             'memorias usb', 'pantallas', 'bocinas', 'audifonos']
@@ -99,7 +136,7 @@ con los 10 productos con menores búsquedas.
     for product in products[:,0]:
         category.append([product, products[int(product)-1,3]])
     
-#5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA 
+    #5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA 
     #Creacion de matriz con id product, no de ventas, categoría 
     sorted_sales_cate = []
     for key, value in count_sales.items():
@@ -108,7 +145,7 @@ con los 10 productos con menores búsquedas.
     less_saled_cate = groupby(categories, sorted_sales_cate, 5)
     print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
 
-#10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
+    #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
     sorted_searches_cate = []
     for key, value in count_searches.items():
         sorted_searches_cate.append([key, value, category[key-1][1]])
@@ -123,18 +160,12 @@ con los 10 productos con menores búsquedas.
     Mostrar dos listados de 5 productos cada una, un listado para
     productos con las mejores reseñas y otro para las peores, considerando
     los productos con devolución. (No cosiderar sin reseña)
-
-    ifestore_searches = [id_search, id product]
-        lifestore_sales = [id_sale, id_product, score (from 1 to 5), date, refund (1 for true or 0 to false)]
-        lifestore_products = [id_product, name, price, category, stock]
-        sales[:,1].count(product)
     """
 
-    
     sales_reviewed = sales[:,(1,2)]
     categories = str(list(range(1, 97)))
 
-#Futura función que agrupa según score. No considera los productos sin reseñas. 
+    #Agrupa según score. No considera los productos sin reseñas. 
     top_products_reviewed=[]
     for j in range(1, 97):
         temp=[]
@@ -145,7 +176,7 @@ con los 10 productos con menores búsquedas.
         if temp != []:
             top_products_reviewed.append([j, temp])
     
-#Futura variable que calcula el promedio redondeado a dos decimales de la lista de scores por producto 
+    #Calculo del promedio redondeado a dos decimales de la lista de scores por producto 
     average_scores = []
     for id, scores in top_products_reviewed:
         sum = 0
@@ -164,13 +195,11 @@ con los 10 productos con menores búsquedas.
     print("\nLa lista con los 5 productos con peores reseñas son: \n" + 
         str(list(sorted_scores)[::-1][0:5]))
 
-    
     """
     Total de ingresos y ventas promedio mensuales, total anual y meses con más ventas al año. 
     (número de ventas, total de ingresos)
     """
-    from datetime import datetime
-    
+
     # Creación de matriz con precio del producto vendido y fecha de venta.
     # convertimos un string con formato <día>/<mes>/<año> en datetime.
 
@@ -181,6 +210,8 @@ con los 10 productos con menores búsquedas.
             datetime.strptime(date, '%d/%m/%Y')
             ])
 
+    #Creación de matriz de mes vs lista de los precios de los productos vendidos en ese mes. 
+    #Se omite 2019 porque solo hay una venta. 
     sales_per_month_year=[]
     for j in range(1, 13):
         #print(type(j)) #En caso de que necesites validar consistencia de tipado 
@@ -191,10 +222,31 @@ con los 10 productos con menores búsquedas.
                 temp.append(date_count_sales[i][0])
 
         sales_per_month_year.append([j, temp])
-
-    print(sales_per_month_year)
     
+    #HACA FALTA HACER UN TENSOR PARA PODER CONSIDERAR EL AÑO 2019 
 
+    #Creación de matriz con mes vs número de ventas, suma de ventas por mes
+    #Sacar el ingreso neto anual (sum_annual) del 2020
+    sales_per_month = []
+    sum_annual = 0
+    for month, prices in sales_per_month_year:
+        sum = 0
+        no_sales = len(prices)
+        for i in prices:
+            sum += int(i)
+            sum_annual += int(i)
+
+        sales_per_month.append([month, no_sales, sum])
+
+    #Creación de diccionario que tenga mes:número de ventas 
+    #Ordenamiento con la función ordenamiento de burbuja para mostrar los meses con más ventas en orden 
+    #ascendente 
+    months_sales = {sales_per_month[i][0]:sales_per_month[i][1] for i in range(len(sales_per_month))}
+    month_highest_sales = ordenamineto_de_burbuja(months_sales)
+    
+    print("\n\nLos meses con más ventas del año 2020 son: " + str(month_highest_sales))
+    print("\n\nEn ingreso anual del 2020 es: " + str(sum_annual))
+    print("\n\nEl ingreso neto y el número de ventas por mes del 2020: \n"+ str(sales_per_month))
 
 if __name__ == '__main__':
     main()

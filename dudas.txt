@@ -1,0 +1,10 @@
+Cómo indicamos los productos, con el id o con el nombre
+    Crear funcion que muestre datos del producto según id del producto. 
+
+Qué hacemos con la única venta en 2019 
+    Tensor en dado caso que deba ser considerado 
+
+Cosas por hacer:
+homologar todos las comillas 
+Comentar lo que hace el código
+Ver si hacemos el Login con un decorador 
