@@ -95,29 +95,16 @@ def main():
 
     #5 PRODUCTOS CON MAYORES VENTAS
     id_prod_sales = list(sales[:,1])
-    
     count_sales = {int(product): id_prod_sales.count(product) for product in products[:,0]}
-
-    # for product in products[:,0]:
-    #     count_sales.update({
-    #         int(product): id_prod_sales.count(product)})
-
     sales_sorted = ordenamineto_de_burbuja(count_sales)
     
     #Primeros 5 numeros de sales 
     head_sales = dict(list(sales_sorted.items())[0:5])
-
     print(f"Los 5 productos con mayores ventas \n" + str(head_sales))
     
     #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     id_prod_searches = list(searches[:,1])
-    
     count_searches = {int(product): id_prod_searches.count(int(product)) for product in products[:,0]}
-
-    # for product in products[:,0]:
-    #     count_searches.update({
-    #         int(product): id_prod_searches.count(int(product))})
-    
     searches_sorted = ordenamineto_de_burbuja(count_searches)
     
     #Primeros 10 números de sales 
@@ -133,27 +120,17 @@ def main():
             'memorias usb', 'pantallas', 'bocinas', 'audifonos']
     
     category = [[product, products[int(product)-1,3]] for product in products[:,0]]
-   
-   #Creación de matriz id_product y category 
-    # for product in products[:,0]:
-    #     category.append([product, products[int(product)-1,3]])
     
     #5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA 
     #Creacion de matriz con id product, no de ventas, categoría 
-    
-    sorted_sales_cate = [[key, value, category[key-1][1]] for key, value in count_sales.items()]
-
-    # for key, value in count_sales.items():
-    #     sorted_sales_cate.append([key, value, category[key-1][1]])
-
+    sorted_sales_cate = [[key, value, category[key-1][1]] 
+                        for key, value in count_sales.items()]
     less_saled_cate = groupby(categories, sorted_sales_cate, 5)
     print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
 
     #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
-    sorted_searches_cate = [[key, value, category[key-1][1]] for key, value in count_searches.items()]
-    # for key, value in count_searches.items():
-    #     sorted_searches_cate.append([key, value, category[key-1][1]])
-
+    sorted_searches_cate = [[key, value, category[key-1][1]] 
+                            for key, value in count_searches.items()]
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
     print(f'\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
     
@@ -192,7 +169,6 @@ def main():
     
     sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
     
-    
     print("\nLa lista con los 5 productos con mejores reseñas son: \n" + 
         str(list(sorted_scores)[0:5]))
 
@@ -206,28 +182,19 @@ def main():
 
     # Creación de matriz con precio del producto vendido y fecha de venta.
     # convertimos un string con formato <día>/<mes>/<año> en datetime.
-
     date_count_sales =[[
             products[int(id_product)-1, 2],
             datetime.strptime(date, '%d/%m/%Y')] 
             for  id_product, date in sales[:,(1,3)]] 
-
-    # for  id_product, date in sales[:,(1,3)]:
-    #     date_count_sales.append([
-    #         products[int(id_product)-1, 2],
-    #         datetime.strptime(date, '%d/%m/%Y')
-    #         ])
 
     #Creación de matriz de mes vs lista de los precios de los productos vendidos en ese mes. 
     #Se omite 2019 porque solo hay una venta. 
     sales_per_month_year=[]
     for j in range(1, 13):
         #print(type(j)) #En caso de que necesites validar consistencia de tipado 
-        temp=[]
-        for i in range(0, len(date_count_sales)):
-            #print(type(date_count_sales[i][1])) #En caso de que necesites validar consistencia de tipado 
-            if int(date_count_sales[i][1].month) == j and int(date_count_sales[i][1].year) > 2019:
-                temp.append(date_count_sales[i][0])
+        temp=[date_count_sales[i][0] 
+            for i in range(0, len(date_count_sales)) 
+            if int(date_count_sales[i][1].month) == j and int(date_count_sales[i][1].year) > 2019]
 
         sales_per_month_year.append([j, temp])
     
