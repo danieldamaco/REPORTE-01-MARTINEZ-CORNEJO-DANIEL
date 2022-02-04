@@ -8,3 +8,4 @@ Cosas por hacer:
 homologar todos las comillas 
 Comentar lo que hace el código
 Ver si hacemos el Login con un decorador 
+Checar si se usa o no los productos devueltos 
