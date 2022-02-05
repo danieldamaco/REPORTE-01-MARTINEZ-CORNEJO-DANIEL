@@ -2,6 +2,8 @@ from lifestore_file import lifestore_products, lifestore_sales, lifestore_search
 import numpy as np 
 from datetime import datetime
 
+"""Función decoradora que permite acceder o no a otra función si el autentificando al usuario 
+con un username y una contraseña"""
 def login(func):
     def wrapper():
         usuarioAccedio = False
@@ -36,19 +38,16 @@ def login(func):
 def showing_products(a):
     pass
 
-def ordenamineto_de_burbuja(dict):
-    """
+"""
     Funcion para ordenar los valores de un diccionario utilizando el algortimo de ordenamiento 
     de burbuja. 
     Se requiere primero realizar una lista con los valores del diccionario y otra de las llaves
     para que amabas listas sean ordenadas en funcion de los valores del diccionaro. Posteriormente,
-    con un ciclo for se realiza de nuevo un diccionario pero con los elementos con el nuevo orden
-    y se retrona dicho diccionario ordenado.  
+    se devuelven los datos en un diccionario pero con los elementos con el nuevo orden.  
     """
-
+def ordenamineto_de_burbuja(dict):
     values = list(dict.values())
     keys = list(dict.keys())
-    sorted_dict = {}
     n = len(values) #siempre que hagamos un len y queremos usarlo 
                     #tenemos que restarle uno (n-1)
 
@@ -58,18 +57,17 @@ def ordenamineto_de_burbuja(dict):
                 values[j], values[j+1] = values[j+1], values[j]
                 keys[j], keys[j+1] = keys[j+1], keys[j]
 
-    for i in range(len(values)):
-        sorted_dict.update({
-            keys[i]: values[i]})
-    
+    sorted_dict = {keys[i]: values[i] for i in range(n)}
     return sorted_dict
 
+"""
+    Función que agrupa los elementos por categoria con la estructura [nombre de la categoría, 
+    los n últimos valores (ventas/búsquedas)]. 
+    Devuelve los elementos agrupados en una lista en orden ascendente y solo los n 
+    primeros números. 
+    """
 def groupby(categories, sorted_sales_cate, n):
-    """
-    Función que genera una matriz que agrupa los elementos por categoria
-    con la estructura [nombre de la categoría, los n últimos valores (ventas/búsquedas)]
-    """
-
+    
     less_saled_cate=[]
     for j in categories:
         temp=[]
@@ -89,46 +87,53 @@ def main():
     - Generar un listado de los 5 productos con mayores ventas y con los 10 
     productos con mayores búsquedas. 
     """
+    #Conversión de las matrices en arreglos con Numpy 
     sales = np.array(lifestore_sales)
     products = np.array(lifestore_products)
     searches = np.array(lifestore_searches)
 
     #5 PRODUCTOS CON MAYORES VENTAS
+    #Creación de un diccionario de id_product y número de ventas por producto, y ordenamiento 
+    # de ellos en orden descendente. 
     id_prod_sales = list(sales[:,1])
     count_sales = {int(product): id_prod_sales.count(product) for product in products[:,0]}
     sales_sorted = ordenamineto_de_burbuja(count_sales)
     
-    #Primeros 5 numeros de sales 
+    #Primeros 5 números de sales ordenado.  
     head_sales = dict(list(sales_sorted.items())[0:5])
-    print(f"Los 5 productos con mayores ventas \n" + str(head_sales))
+    print(f"Los 5 productos con mayores ventas: \n" + str(head_sales))
     
     #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
+    #Creación de diccionario de id_product y número de búsqueda por producto, y ordenamiento 
+    # descendente. 
     id_prod_searches = list(searches[:,1])
     count_searches = {int(product): id_prod_searches.count(int(product)) for product in products[:,0]}
     searches_sorted = ordenamineto_de_burbuja(count_searches)
     
-    #Primeros 10 números de sales 
+    #Primeros 10 números de búsquedas  
     head_searches = dict(list(searches_sorted.items())[0:10])
-    print(f"\n Los 10 productos con mayores busquedas \n" + str(head_searches))
+    print(f"\n Los 10 productos con mayores busquedas: \n" + str(head_searches))
 
     """
      - Por categorías, generar un listado con los 5 productos con menores ventas y 
     con los 10 productos con menores búsquedas. 
     """
-
+    #Creación de lista "categories" que contiene todas las categorías de los productos, 
+    # y una lista "category" que contenga id_producto y categoría. 
     categories = ['procesadores', 'tarjetas de video', 'tarjetas madre', 'discos duros', 
-            'memorias usb', 'pantallas', 'bocinas', 'audifonos']
-    
-    category = [[product, products[int(product)-1,3]] for product in products[:,0]]
+                'memorias usb', 'pantallas', 'bocinas', 'audifonos']
+    category = [[product, products[int(product)-1, 3]] for product in products[:,0]]
     
     #5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA 
-    #Creacion de matriz con id product, no de ventas, categoría 
+    #Creacion de matriz con id product, número de ventas, categoría 
     sorted_sales_cate = [[key, value, category[key-1][1]] 
                         for key, value in count_sales.items()]
     less_saled_cate = groupby(categories, sorted_sales_cate, 5)
     print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
 
-    #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS 
+    #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS
+    # Uso de la función grouby para aparear datos según datos contenidos en lista categories. 
+    # arrojando solo los 10 últimos productos.  
     sorted_searches_cate = [[key, value, category[key-1][1]] 
                             for key, value in count_searches.items()]
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
@@ -142,11 +147,10 @@ def main():
     productos con las mejores reseñas y otro para las peores, considerando
     los productos con devolución. (No cosiderar sin reseña)
     """
-
+    #Arreglo con id_producto y score de reseña. 
     sales_reviewed = sales[:,(1,2)]
-    categories = str(list(range(1, 97)))
 
-    #Agrupa según score. No considera los productos sin reseñas. 
+    #Agrupa de scores según id_product. No considera los productos sin reseñas. 
     top_products_reviewed=[]
     for j in range(1, 97):
         temp=[]
@@ -157,16 +161,19 @@ def main():
         if temp != []:
             top_products_reviewed.append([j, temp])
     
-    #Calculo del promedio redondeado a dos decimales de la lista de scores por producto 
+    #Cálculo del promedio redondeado a dos decimales de la lista de scores por producto. 
     average_scores = []
     for id, scores in top_products_reviewed:
         sum = 0
+
         for i in scores:
             sum += int(i)
+
         mean = round(sum/len(scores), 2)
 
         average_scores.append([id, mean])
     
+    #Ordenamiento descendente de id_producto y score promedio por producto. 
     sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
     
     print("\nLa lista con los 5 productos con mejores reseñas son: \n" + 
@@ -181,7 +188,7 @@ def main():
     """
 
     # Creación de matriz con precio del producto vendido y fecha de venta.
-    # convertimos un string con formato <día>/<mes>/<año> en datetime.
+    # conversión de un string con formato <día>/<mes>/<año> en datetime.
     date_count_sales =[[
             products[int(id_product)-1, 2],
             datetime.strptime(date, '%d/%m/%Y')] 
@@ -191,15 +198,12 @@ def main():
     #Se omite 2019 porque solo hay una venta. 
     sales_per_month_year=[]
     for j in range(1, 13):
-        #print(type(j)) #En caso de que necesites validar consistencia de tipado 
         temp=[date_count_sales[i][0] 
             for i in range(0, len(date_count_sales)) 
             if int(date_count_sales[i][1].month) == j and int(date_count_sales[i][1].year) > 2019]
 
         sales_per_month_year.append([j, temp])
     
-    #HACA FALTA HACER UN TENSOR PARA PODER CONSIDERAR EL AÑO 2019 
-
     #Creación de matriz con mes vs número de ventas, suma de ventas por mes
     #Sacar el ingreso neto anual (sum_annual) del 2020
     sales_per_month = []
@@ -215,7 +219,7 @@ def main():
 
     #Creación de diccionario que tenga mes:número de ventas 
     #Ordenamiento con la función ordenamiento de burbuja para mostrar los meses con más ventas en orden 
-    #ascendente 
+    #descendente  
     months_sales = {sales_per_month[i][0]:sales_per_month[i][1] for i in range(len(sales_per_month))}
     month_highest_sales = ordenamineto_de_burbuja(months_sales)
     
