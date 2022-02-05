@@ -107,7 +107,7 @@ def main():
     n=5
     head_sales = dict(list(sales_sorted.items())[0:n])
 
-    print(f"Los {n} productos con mayores ventas \n" + str(head_sales))
+    print(f'Los {n} productos con mayores ventas \n' + str(head_sales))
     
     #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     id_prod_searches = list(searches[:,1])
@@ -121,7 +121,7 @@ def main():
     #Primeros n numeros de sales 
     n=10
     head_searches = dict(list(searches_sorted.items())[0:n])
-    print(f"\n Los {n} productos con mayores busquedas \n" + str(head_searches))
+    print(f'\n Los {n} productos con mayores busquedas \n' + str(head_searches))
 
     """
      - Por categorías, generar un listado con los 5 productos con menores ventas y 
@@ -189,10 +189,10 @@ def main():
     sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
     
     
-    print("\nLa lista con los 5 productos con mejores reseñas son: \n" + 
+    print('\nLa lista con los 5 productos con mejores reseñas son: \n' + 
         str(list(sorted_scores)[0:5]))
 
-    print("\nLa lista con los 5 productos con peores reseñas son: \n" + 
+    print('\nLa lista con los 5 productos con peores reseñas son: \n' + 
         str(list(sorted_scores)[::-1][0:5]))
 
     """
@@ -244,9 +244,9 @@ def main():
     months_sales = {sales_per_month[i][0]:sales_per_month[i][1] for i in range(len(sales_per_month))}
     month_highest_sales = ordenamineto_de_burbuja(months_sales)
     
-    print("\n\nLos meses con más ventas del año 2020 son: " + str(month_highest_sales))
-    print("\n\nEn ingreso anual del 2020 es: " + str(sum_annual))
-    print("\n\nEl ingreso neto y el número de ventas por mes del 2020: \n"+ str(sales_per_month))
+    print('\n\nLos meses con más ventas del año 2020 son: ' + str(month_highest_sales))
+    print('\n\nEn ingreso anual del 2020 es: ' + str(sum_annual))
+    print('\n\nEl ingreso neto y el número de ventas por mes del 2020: \n'+ str(sales_per_month))
 
 if __name__ == '__main__':
     main()

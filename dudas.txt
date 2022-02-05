@@ -4,6 +4,11 @@ Cómo indicamos los productos, con el id o con el nombre
 Qué hacemos con la única venta en 2019 
     Tensor en dado caso que deba ser considerado 
 
+Cambiar librería numpy 
+    Generar función que cree una sub matriz de al original 
+
+Qué tan comendatos debe estar el código
+
 Cosas por hacer:
 homologar todos las comillas 
 Comentar lo que hace el código
