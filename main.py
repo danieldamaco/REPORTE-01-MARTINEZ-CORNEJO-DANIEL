@@ -1,6 +1,14 @@
 from lifestore_file import lifestore_products, lifestore_sales, lifestore_searches
 import numpy as np 
 from datetime import datetime
+import random, os
+
+
+def clear(): #También la podemos llamar cls (depende a lo que estemos acostumbrados)
+    if os.name == "posix":
+        os.system("clear")
+    elif os.name == ("ce", "nt", "dos"):
+        os.system("cls")
 
 """Función decoradora que permite acceder o no a otra función si el autentificando al usuario 
 con un username y una contraseña"""
@@ -9,8 +17,7 @@ def login(func):
         usuarioAccedio = False
         intentos = 0        
         # Bienvenida!
-        mensaje_bienvenida = 'Bienvenide al sistema!\nAccede con tus credenciales'
-        print(mensaje_bienvenida)
+        print('Bienvenide al sistema!\nInicio de sesión')
 
         # Recibo constantemente sus intentos
         while not usuarioAccedio:
@@ -19,14 +26,15 @@ def login(func):
             contras = input('Contraseña: ')
             intentos += 1
             # Reviso si el par coincide
-            if usuario == 'jimmy' and contras == 'ymmij':
+            if usuario == 'daniel' and contras == 'daniel':
                 usuarioAccedio = True
-                print('\n\nHola de nuevo!\n\nDatos del análisis. \n\n')
+                clear()
+                print(f'Hola de nuevo {usuario}!\n\nDatos del análisis. \n\n')
                 func() #Correr función. 
             else:
-                # print('Tienes', 3 - intentos, 'intentos restantes')
+                clear()
                 print(f'Tienes {3 - intentos} intentos restantes')
-                if usuario == 'jimmy':
+                if usuario == 'daniel':
                     print('Te equivocaste en la contraseña')
                 else:
                     print(f'El usuario: "{usuario}" no esta registrado')
@@ -41,7 +49,7 @@ def login(func):
 def printing_list(list, title, word):
     print('\n\n'+title )
     for i in list:
-        printing_dict(i[1], title=str(i[0]), word=word)
+        printing_dict(i[1], title=str(i[0]).capitalize(), word=word)
 
 def printing_dict(dict, title, word):
     string= '\n'+title 
@@ -87,7 +95,7 @@ def groupby(categories, sorted_sales_cate, n):
         less_saled_cate.append([j, temp_sorted])
     return less_saled_cate
 
-#@login #Decorador para el login
+@login #Decorador para el login
 def main():
     """
     1) Productos más vendidos y productos rezagados a partir del análisis de
@@ -239,7 +247,7 @@ def main():
         string += '\n' + m[int(key)-1] +' con ' + str(value) + ' ventas '
     print(string)
 
-    print('\n\nEn ingreso anual del 2020 es:\n' + str(sum_annual))
+    print('\n\nEn ingreso anual del 2020 es:\n$' + str(sum_annual))
    
    #Recorrer lista sales_per_month para mostrar en pantalla su contenido. 
     string= '\n\nEl ingreso neto y el número de ventas por mes del 2020:'
