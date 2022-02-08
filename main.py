@@ -35,9 +35,19 @@ def login(func):
                 exit()
     return wrapper
 
-def showing_products(a):
+
     pass
 
+def printing_list(list, title, word):
+    print('\n\n'+title )
+    for i in list:
+        printing_dict(i[1], title=str(i[0]), word=word)
+
+def printing_dict(dict, title, word):
+    string= '\n'+title 
+    for key, value in dict.items():
+        string += '\n' +'El producto ' +'con ID '+ str(key) + ' con ' + str(value) + ' ' + word +' es ' + str(lifestore_products[int(key)-1][1])
+    return print(string)
 """
     Funcion para ordenar los valores de un diccionario utilizando el algortimo de ordenamiento 
     de burbuja. 
@@ -59,7 +69,6 @@ def ordenamineto_de_burbuja(dict):
 
     sorted_dict = {keys[i]: values[i] for i in range(n)}
     return sorted_dict
-
 """
     Función que agrupa los elementos por categoria con la estructura [nombre de la categoría, 
     los n últimos valores (ventas/búsquedas)]. 
@@ -74,11 +83,11 @@ def groupby(categories, sorted_sales_cate, n):
         for i in range(0, len(sorted_sales_cate)):
             if sorted_sales_cate[i][2] == j:
                 temp.append([sorted_sales_cate[i][0], sorted_sales_cate[i][1]])
-        temp_sorted = list(ordenamineto_de_burbuja(dict(temp)))[::-1]
-        less_saled_cate.append([j,temp_sorted[0:n]])
+        temp_sorted = dict(list(ordenamineto_de_burbuja(dict(temp)).items())[::-1][0:n])
+        less_saled_cate.append([j, temp_sorted])
     return less_saled_cate
 
-@login #Decorador para el login
+#@login #Decorador para el login
 def main():
     """
     1) Productos más vendidos y productos rezagados a partir del análisis de
@@ -101,7 +110,7 @@ def main():
     
     #Primeros 5 números de sales ordenado.  
     head_sales = dict(list(sales_sorted.items())[0:5])
-    print(f'Los 5 productos con mayores ventas: \n' + str(head_sales))
+    printing_dict(head_sales, title='\nLos 5 productos con mayores ventas son:', word= 'ventas')
     
     #PRIMEROS 10 PRODUCTOS CON MAYOR BUSQUEDA 
     #Creación de diccionario de id_product y número de búsqueda por producto, y ordenamiento 
@@ -112,7 +121,7 @@ def main():
     
     #Primeros 10 números de búsquedas  
     head_searches = dict(list(searches_sorted.items())[0:10])
-    print(f'\n Los 10 productos con mayores busquedas: \n' + str(head_searches))
+    printing_dict(head_searches, title='\nLos 10 productos con mayores busquedas:', word='búsquedas')
 
     """
      - Por categorías, generar un listado con los 5 productos con menores ventas y 
@@ -129,15 +138,16 @@ def main():
     sorted_sales_cate = [[key, value, category[key-1][1]] 
                         for key, value in count_sales.items()]
     less_saled_cate = groupby(categories, sorted_sales_cate, 5)
-    print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
-
+    #print(f'\n Los 5 productos con menos ventas por categoría son: \n' + str(less_saled_cate))
+    printing_list(less_saled_cate, title='Los 5 productos con menos ventas por categoría son:', word='ventas')
     #10 PRODUCTOS CON MENORES BUSQUEDAS POR CATEGORÍAS
     # Uso de la función grouby para aparear datos según datos contenidos en lista categories. 
     # arrojando solo los 10 últimos productos.  
     sorted_searches_cate = [[key, value, category[key-1][1]] 
                             for key, value in count_searches.items()]
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
-    print(f'\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
+    printing_list(less_searches_cate, title='Los 10 productos con menos busquedas por categoría son:', word='búsquedas')
+    #print(f'\n Los 10 productos con menos busquedas por categoría son: \n' + str(less_searches_cate))
     
     """
     2) Productos por reseña en el servicio a partir del análisis de categorías
@@ -176,27 +186,25 @@ def main():
     #Ordenamiento descendente de id_producto y score promedio por producto. 
     sorted_scores = ordenamineto_de_burbuja(dict(average_scores))
     
+    printing_dict(dict(list(sorted_scores.items())[0:5]), title='\nLa lista con los 5 productos con mejores reseñas son:', word='de score')
+    printing_dict(dict(list(sorted_scores.items())[::-1][0:5]), title='\nLa lista con los 5 productos con peores reseñas son:', word='de score')
     
-    print('\nLa lista con los 5 productos con mejores reseñas son: \n' + 
-        str(list(sorted_scores)[0:5]))
-
-    print('\nLa lista con los 5 productos con peores reseñas son: \n' + 
-        str(list(sorted_scores)[::-1][0:5]))
-
     """
     Total de ingresos y ventas promedio mensuales, total anual y meses con más ventas al año. 
     (número de ventas, total de ingresos)
     """
 
-    # Creación de matriz con precio del producto vendido y fecha de venta.
+    # Creación de matriz con precio del producto vendido y fecha de venta,
+    # se omiten los produtos devueltos.
     # conversión de un string con formato <día>/<mes>/<año> en datetime.
     date_count_sales =[[
             products[int(id_product)-1, 2],
             datetime.strptime(date, '%d/%m/%Y')] 
-            for  id_product, date in sales[:,(1,3)]] 
+            for  i, id_product, date in sales[:,(0,1,3)]
+            if int(sales[int(i)-1, 4]) != 1] 
 
     #Creación de matriz de mes vs lista de los precios de los productos vendidos en ese mes. 
-    #Se omite 2019 porque solo hay una venta. 
+    #Se omite 2019 porque la única venta que se realizó fue devuelta. 
     sales_per_month_year=[]
     for j in range(1, 13):
         temp=[date_count_sales[i][0] 
@@ -224,9 +232,19 @@ def main():
     months_sales = {sales_per_month[i][0]:sales_per_month[i][1] for i in range(len(sales_per_month))}
     month_highest_sales = ordenamineto_de_burbuja(months_sales)
     
-    print('\n\nLos meses con más ventas del año 2020 son: ' + str(month_highest_sales))
-    print('\n\nEn ingreso anual del 2020 es: ' + str(sum_annual))
-    print('\n\nEl ingreso neto y el número de ventas por mes del 2020: \n'+ str(sales_per_month))
+    #Recorrer diccionario month_highest_sales para motrar en pantalla su contenido. 
+    m = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    string= '\n\nLos meses con más ventas del año 2020 son:'
+    for key, value in month_highest_sales.items():
+        string += '\n' + m[int(key)-1] +' con ' + str(value) + ' ventas '
+    print(string)
 
+    print('\n\nEn ingreso anual del 2020 es:\n' + str(sum_annual))
+   
+   #Recorrer lista sales_per_month para mostrar en pantalla su contenido. 
+    string= '\n\nEl ingreso neto y el número de ventas por mes del 2020:'
+    for i in sales_per_month:
+        string += '\n' + m[int(i[0])-1] +' con ' + str(i[1]) + ' ventas ' + 'y $' + str(i[2]) + ' de ingreso neto'
+    print(string)
 if __name__ == '__main__':
     main()
