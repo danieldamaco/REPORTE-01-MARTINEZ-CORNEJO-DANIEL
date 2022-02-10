@@ -2,7 +2,6 @@ Notas:
     Se elimina el único producto vendido en 2019 porque se devuelve. 
     Se consideran devoluciones en en todos los análisis de ventas. (menos en el de ingreso total)
 Cosas por hacer: 
-    
 
 Hipótesis:
     El producto 54 se repite como  el más vendido y el más buscado. (50, 263)
