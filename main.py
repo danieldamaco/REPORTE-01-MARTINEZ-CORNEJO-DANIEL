@@ -1,6 +1,9 @@
+from re import template
+import statistics
 from lifestore_file import lifestore_products, lifestore_sales, lifestore_searches
 from datetime import datetime
 import random, os
+import statistics
 
 """Función que permite borrar los datos previos de la terminal"""
 def clear(): 
@@ -44,7 +47,13 @@ def login(func):
     return wrapper
 
 
-    pass
+"""Función que itera los elementos de un diccionario con las respuestas y los imprime en forma de tabla
+emparejando el ID del producto y el nombre genérico del producto"""
+def printing_dict(dict, title, word):
+    string= '\n'+title 
+    for key, value in dict.items():
+        string += '\n' +'El producto ' +'con ID '+ str(key) + ' con ' + str(value) + ' ' + word +' es ' + str(lifestore_products[int(key)-1][1])
+    return print(string)
 
 
 """Función que itera los elementos de una lista con las respuestas y los imprime en forma de tabla
@@ -55,17 +64,7 @@ def printing_list(list, title, word):
         printing_dict(i[1], title=str(i[0]).capitalize(), word=word)
 
 
-"""Función que itera los elementos de un diccionario con las respuestas y los imprime en forma de tabla
-emparejando el ID del producto y el nombre genérico del producto"""
-def printing_dict(dict, title, word):
-    string= '\n'+title 
-    for key, value in dict.items():
-        string += '\n' +'El producto ' +'con ID '+ str(key) + ' con ' + str(value) + ' ' + word +' es ' + str(lifestore_products[int(key)-1][1])
-    return print(string)
-
-
-"""
-    Funcion para ordenar los valores de un diccionario utilizando el algortimo de ordenamiento 
+"""Funcion para ordenar los valores de un diccionario utilizando el algortimo de ordenamiento 
     de burbuja. 
     Se requiere primero realizar una lista con los valores del diccionario y otra de las llaves
     para que amabas listas sean ordenadas en funcion de los valores del diccionaro. Posteriormente,
@@ -87,12 +86,13 @@ def bubble_sort(dict):
     return sorted_dict
 
 
-"""
-    Función que agrupa los elementos por categoria con la estructura [nombre de la categoría, 
+"""Función que agrupa los elementos por categoria con la estructura [nombre de la categoría, 
     los n últimos valores (ventas/búsquedas)]. 
     Devuelve los elementos agrupados en una lista en orden ascendente y solo los n 
     primeros números. 
     """
+
+
 def groupby(categories, sorted_categories, n):
     
     less_cate=[]
@@ -141,12 +141,10 @@ def main():
     con los 10 productos con menores búsquedas. 
     """
     #Creación de lista "categories" que contiene todas las categorías de los productos, 
-    # "prod_categories" es una lista con las categorías directamente extraidas de lifestore_products
     # y una lista "category" que contenga id_producto y categoría. 
     categories = ['procesadores', 'tarjetas de video', 'tarjetas madre', 'discos duros', 
                 'memorias usb', 'pantallas', 'bocinas', 'audifonos']
-    prod_categories = [a[3] for a in lifestore_products]
-    category = [[product, prod_categories[int(product)-1]] for product in products] 
+    category = [[a[0], a[3]] for a in lifestore_products]
     
     #5 PRODUCTOS CON MENORES VENTAS POR CATEGORÍA_____________________________________________________________
     #Creacion de matriz con id product, número de ventas, categoría 
@@ -163,12 +161,9 @@ def main():
                             for key, value in count_searches.items()]
     less_searches_cate = groupby(categories, sorted_searches_cate, 10)
     
-    printing_list(less_searches_cate, title='Los 10 productos con menos busquedas por categoría son:', word='búsquedas')
+    printing_list(less_searches_cate, title='Los 10 productos con menos búsquedas por categoría son:', word='búsquedas')
     
     """
-    2) Productos por reseña en el servicio a partir del análisis de categorías
-    con mayores ventas y categorías con mayores búsquedas.
-
     Mostrar dos listados de 5 productos cada una, un listado para
     productos con las mejores reseñas y otro para las peores, considerando
     los productos con devolución. (No cosiderar sin reseña)
@@ -176,26 +171,16 @@ def main():
     #Arreglo con id_producto y score de reseña. 
     sales_reviewed = [[a[1], a[2]] for a in lifestore_sales]
 
-    #Agrupa de scores según id_product. 
-    top_products_reviewed=[]
+    #Agrupa de scores según id_product y sacar promedio de scores. 
+    average_scores=[]
     for j in range(1, 97):
         temp=[]
         for i in range(0, len(sales_reviewed)):
             if str(sales_reviewed[i][0]) == str(j):
                 temp.append(sales_reviewed[i][1])
-        #Para no considera los productos sin reseñas. 
+        #Para no considerar los productos sin reseñas. 
         if temp != []:
-            top_products_reviewed.append([j, temp])
-    
-    print(sales_reviewed[0][0])
-    #Cálculo del promedio redondeado a dos decimales de la lista de scores por producto. 
-    average_scores = []
-    for id, scores in top_products_reviewed:
-        sum = 0
-        for i in scores:
-            sum += int(i)
-        mean = round(sum/len(scores), 2)
-        average_scores.append([id, mean])
+            average_scores.append([j, round(statistics.mean(temp), 2)])
     
     #Ordenamiento descendente de id_producto y score promedio por producto. 
     sorted_scores = bubble_sort(dict(average_scores))
@@ -207,49 +192,30 @@ def main():
     Total de ingresos y ventas promedio mensuales, total anual y meses con más ventas al año. 
     (número de ventas, total de ingresos)
     """
-    #"score" lista que contiene los scores de las reviews por venta
-    #"date_sales" lista que contiene index de venta, id del producto, fecha de venta
-    #"prod_price" lsita que contiene el precio de cada producto 
-    score = [a[4] for a in lifestore_sales]
-    date_sales = [[a[0], a[1], a[3]] for a in lifestore_sales]
-    prod_price = [a[2] for a in lifestore_products]
     
     # Creación de matriz con precio del producto vendido y fecha de venta,
     # se omiten los produtos devueltos.
     # conversión de un string con formato <día>/<mes>/<año> en datetime.
     date_count_sales =[[
-            prod_price[int(id_product)-1],
+            lifestore_products[int(id_product)-1][2],
             datetime.strptime(date, '%d/%m/%Y')] 
-            for  i, id_product, date in date_sales
-            if int(score[int(i)-1]) != 1] 
+            for  i, id_product, score, date, returned in lifestore_sales
+            if int(returned) != 1] 
 
     #Creación de matriz de mes vs lista de los precios de los productos vendidos en ese mes. 
     #Se omite 2019 porque la única venta que se realizó fue devuelta. 
-    sales_per_month_year=[]
+    sales_per_month=[]
     for j in range(1, 13):
-        temp=[date_count_sales[i][0] 
-            for i in range(0, len(date_count_sales)) 
-            if int(date_count_sales[i][1].month) == j and int(date_count_sales[i][1].year) > 2019]
+        temp=[i[0] for i in date_count_sales if int(i[1].month) == j]
 
-        sales_per_month_year.append([j, temp])
+        sales_per_month.append([j, len(temp), sum(temp)])
     
-    #Creación de matriz con mes vs número de ventas, suma de ventas por mes
-    #Sacar el ingreso neto anual (sum_annual) del 2020
-    sales_per_month = []
-    sum_annual = 0
-    for month, prices in sales_per_month_year:
-        sum = 0
-        no_sales = len(prices)
-        for i in prices:
-            sum += int(i)
-            sum_annual += int(i)
-
-        sales_per_month.append([month, no_sales, sum])
+    sum_annual= sum([a[2] for a in sales_per_month])
 
     #Creación de diccionario que tenga mes:número de ventas 
     #Ordenamiento con la función ordenamiento de burbuja para mostrar los meses con más ventas en orden 
     #descendente  
-    months_sales = {sales_per_month[i][0]:sales_per_month[i][1] for i in range(len(sales_per_month))}
+    months_sales = {i[0]:i[1] for i in sales_per_month}
     month_highest_sales = bubble_sort(months_sales)
     
     #Recorrer diccionario month_highest_sales para motrar en pantalla su contenido. 
