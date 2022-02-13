@@ -1,5 +1,3 @@
-from re import template
-import statistics
 from lifestore_file import lifestore_products, lifestore_sales, lifestore_searches
 from datetime import datetime
 import random, os
